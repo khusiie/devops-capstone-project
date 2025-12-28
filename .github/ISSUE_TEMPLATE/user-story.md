@@ -1,6 +1,6 @@
 ---
 name: User Story
-description: Template for creating a new user story
+description: Use this template for creating new user stories.
 title: "User Story: "
 labels: enhancement
 ---
