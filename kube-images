@@ -1,0 +1,17 @@
+Name:			accounts
+Namespace:		sn-labs-kg7460502
+Created:		2 hours ago
+Labels:			<none>
+Annotations:		<none>
+Image Repository:	image-registry.openshift-image-registry.svc:5000/sn-labs-kg7460502/accounts
+Image Lookup:		local=false
+Unique Images:		1
+Tags:			1
+
+1
+  no spec tag
+
+  * image-registry.openshift-image-registry.svc:5000/sn-labs-kg7460502/accounts@sha256:04dd98434f31fad3ccb9b16ce15dffbb75b626377e7e6d2dd417cca865efa5a3
+      2 hours ago
+NAME         IMAGE REFERENCE                                                                                                                                       UPDATED
+accounts:1   image-registry.openshift-image-registry.svc:5000/sn-labs-kg7460502/accounts@sha256:04dd98434f31fad3ccb9b16ce15dffbb75b626377e7e6d2dd417cca865efa5a3   2 hours ago
