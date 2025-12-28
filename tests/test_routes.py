@@ -33,7 +33,15 @@ class TestAccountService(TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        init_db(app)
+
+    # Initialize DB (do NOT wrap in app_context)
+    init_db(app)
+
+    # 🔥 Force Talisman + headers + logging to execute
+    client = app.test_client()
+    client.get("/")      # triggers security headers
+    client.get("/health")
+
 
     @classmethod
     def tearDownClass(cls):
@@ -95,11 +103,9 @@ class TestAccountService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # Make sure location header is set
         location = response.headers.get("Location", None)
         self.assertIsNotNone(location)
 
-        # Check the data is correct
         new_account = response.get_json()
         self.assertEqual(new_account["name"], account.name)
         self.assertEqual(new_account["email"], account.email)
@@ -161,3 +167,35 @@ class TestAccountService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
+
+    def test_cors_headers(self):
+        """It should return a CORS header"""
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn("Access-Control-Allow-Origin", resp.headers)
+
+    def test_security_headers(self):
+        """It should return security headers"""
+        resp = self.client.get("/")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn("X-Content-Type-Options", resp.headers)
+        self.assertIn("X-Frame-Options", resp.headers)
+        self.assertIn("X-XSS-Protection", resp.headers)
+
+    def test_options_cors(self):
+        """It should support CORS preflight"""
+        resp = self.client.open(
+            BASE_URL,
+            method="OPTIONS",
+            headers={
+                "Origin": "http://localhost",
+                "Access-Control-Request-Method": "POST",
+            },
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_root_security_headers(self):
+        """It should return security headers on root"""
+        resp = self.client.get("/")
+        self.assertIn("X-Frame-Options", resp.headers)
+        self.assertIn("X-Content-Type-Options", resp.headers)
